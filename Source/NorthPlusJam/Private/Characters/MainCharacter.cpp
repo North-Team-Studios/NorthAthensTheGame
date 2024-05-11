@@ -76,23 +76,73 @@ void AMainCharacter::Tick(float DeltaTime)
 
 	ACharacter* myCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 
+	AController* PlayerController = Controller;
 	// --------------------
 	FHitResult OutHit;
-
 	//FVector Start = MainCameraComponent->GetComponentLocation();
 	FVector Start = myCharacter->GetActorLocation();
 	FVector ForwardVector = MainCameraComponent->GetForwardVector();
-
 	Start = Start + (ForwardVector * SpringArmComponent->TargetArmLength);
 	FVector End = Start + (ForwardVector * 5000.f);
-
 	//
 	//DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1, 0, 1);
-
 	FVector Location, Direction;
 	Cast<APlayerController>(GetController())->DeprojectMousePositionToWorld(Location, Direction);
-	DrawDebugLine(GetWorld(), Location, Location + Direction * 100.0f, FColor::Red, true);
+	//DrawDebugLine(GetWorld(), Location, Location + Direction * 100.0f, FColor::Red, true);
 
+	//-----------------
+
+	FVector WorldLocation;
+	FVector WorldDirection;
+	float DistanceAboveGround = 200.0f;
+
+	Cast<APlayerController>(GetController())->DeprojectMousePositionToWorld(WorldLocation, WorldDirection);
+
+	FVector PlaneOrigin(0.0f, 0.0f, DistanceAboveGround);
+
+	FVector ActorWorldLocation = FMath::LinePlaneIntersection(
+		WorldLocation,
+		WorldLocation + WorldDirection,
+		PlaneOrigin,
+		FVector::UpVector);
+
+
+	//-----------------
+
+	//FVector worldLoc, worldDir;
+	//myController->DeprojectMousePositionToWorld(worldLoc, worldDir);
+	//FString testString = "loc " + worldLoc.ToString() + " dir " + worldDir.ToString();
+	
+
+	DrawDebugLine(GetWorld(), Location, ActorWorldLocation, FColor::Red, true);
+	GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, ActorWorldLocation.ToString());
+
+
+
+
+
+
+
+
+
+
+	FRotator temp = myCharacter->GetActorRotation();
+	const FRotator resultRotation = FMath::RInterpTo(temp, temp + FRotator(0, 10, 0), DeltaTime, 2.0);
+
+
+	//GEngine->AddOnScreenDebugMessage(-1, 0.1f, FColor::Red, testString);
+
+
+
+
+
+
+	/*UCapsuleComponent Capsule = myCharacter->GetCapsuleComponent();
+	*/
+	//Capsule->SetWorldLocation(ActorWorldLocation);
+	//myCharacter->SetActorLocationAndRotation(myCharacter->GetActorLocation(), WorldDirection, false, 0, ETeleportType::None);
+
+	myCharacter->SetActorRotation(resultRotation);
 }
 
 // Called to bind functionality to input
