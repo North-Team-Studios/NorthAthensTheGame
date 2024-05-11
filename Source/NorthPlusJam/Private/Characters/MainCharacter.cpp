@@ -8,13 +8,16 @@
 #include "EnhancedInputComponent.h"
 #include "InputAction.h"
 
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Runtime/Engine/Classes/GameFramework/PlayerController.h"
+
 #include "Characters/MainCharacter.h"
 
 // Sets default values
 AMainCharacter::AMainCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	//PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = true;
 
 	//Create a spring arm
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("Spring Arm"));
@@ -66,6 +69,29 @@ void AMainCharacter::BeginPlay()
 void AMainCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	float mouseX;
+	float mouseY;
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetMousePosition(mouseX, mouseY);
+	//UE_LOG(MyLog, Warning, TEXT("Mouse Location: %f, %f"), mouseX, mouseY);
+
+	ACharacter* myCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+
+	// --------------------
+	FHitResult OutHit;
+
+	//FVector Start = MainCameraComponent->GetComponentLocation();
+	FVector Start = myCharacter->GetActorLocation();
+	FVector ForwardVector = MainCameraComponent->GetForwardVector();
+
+	Start = Start + (ForwardVector * SpringArmComponent->TargetArmLength);
+	FVector End = Start + (ForwardVector * 5000.f);
+
+	//
+	//DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 1, 0, 1);
+
+	FVector Location, Direction;
+	Cast<APlayerController>(GetController())->DeprojectMousePositionToWorld(Location, Direction);
+	DrawDebugLine(GetWorld(), Location, Location + Direction * 100.0f, FColor::Red, true);
 
 }
 
