@@ -10,8 +10,6 @@ Go on a survival adventure and help Clide restore the city in this third-person,
 
 Game Jam Plus submission game for Bored Cat Studio (formerly North Team Studios), Brazil.
 
-
-
 # Team
 
 ## Kaio Gama - Game Programmer / 3D Character Artist / Technical Artist
